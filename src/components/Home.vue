@@ -20,7 +20,7 @@
           active-text-color="#409EFF"
           router
           :collapse="isCollapse"
-          :unique-opened="true"
+          unique-opened
         >
           <!-- 一级菜单 -->
           <el-submenu

@@ -6,5 +6,71 @@
       <el-breadcrumb-item>用户管理</el-breadcrumb-item>
       <el-breadcrumb-item>用户列表</el-breadcrumb-item>
     </el-breadcrumb>
+
+    <!-- 卡片区域 -->
+    <el-card>
+      <el-row :gutter="20">
+        <el-col :span="8">
+          <el-input
+            placeholder="请输入内容"
+            v-model="queryInfo.query"
+            clearable
+          >
+            <template #append>
+              <!-- slot="append" -->
+              <el-button icon="el-icon-search"></el-button>
+            </template>
+          </el-input>
+        </el-col>
+        <el-col :span="4">
+          <el-button class="button" type="primary">操作按钮</el-button>
+        </el-col>
+      </el-row>
+
+      <!-- 表格区域 -->
+      <el-table :data="userlist" border stripe>
+        <el-table-column type="index"></el-table-column>
+        <el-table-column label="姓名" prop="username"></el-table-column>
+        <el-table-column label="邮箱" prop="email"></el-table-column>
+        <el-table-column label="电话" prop="mobile"></el-table-column>
+        <el-table-column label="角色" prop="role_name"></el-table-column>
+      </el-table>
+    </el-card>
   </div>
 </template>
+<script>
+export default {
+  data() {
+    return {
+      // 条件
+      queryInfo: {
+        query: '',
+        // 当前的页数
+        pagenum: 1,
+        // 当前每页显示多少条数据
+        pagesize: 2
+      },
+      // 总条数
+      total: 0,
+      // 列表数据
+      userlist: []
+    }
+  },
+  created() {
+    this.getUserList()
+  },
+  methods: {
+    // 用户数据列表
+    async getUserList() {
+      const { data: res } = await this.$http.get('users', {
+        params: this.queryInfo
+      })
+      if (res.meta.status !== 200) {
+        return this.$message.error('获取用户列表失败！')
+      }
+      this.userlist = res.data.users
+      this.total = res.data.total
+    }
+  }
+}
+</script>
