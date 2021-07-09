@@ -3,7 +3,11 @@
     <!-- 头部区域 -->
     <el-header>
       <div>
-        <img src="../assets/heima.png" alt="" />
+        <img
+          src="../assets/logo.jpeg"
+          alt=""
+          style="width:50px;height:50px; border-radius:50% ;"
+        />
         <span>车险核保管理系统</span>
       </div>
       <el-button type="info" @click="logout">退出</el-button>
@@ -13,7 +17,7 @@
       <el-aside :width="isCollapse ? '64px' : '200px'">
         <div class="toggle-button" @click="toggleCollapse">|||</div>
         <el-menu
-          default-active="2"
+          :default-active="activePath"
           class="el-menu-vertical-demo"
           background-color="#333744"
           text-color="#fff"
@@ -41,6 +45,7 @@
               :index="'/' + data.path"
               v-for="data in item.children"
               :key="data.id"
+              @click="saveNavState('/' + data.path)"
             >
               <!-- 二级菜单的模板区域 -->
               <template #title>
@@ -75,13 +80,17 @@ export default {
         145: 'iconfont icon-baobiao'
       },
       // 是否折叠
-      isCollapse: false
+      isCollapse: false,
+      // 点击菜单的状态
+      activePath: ''
     }
   },
   created() {
+    this.activePath = window.sessionStorage.getItem('activePath')
     this.getMenuList()
   },
   methods: {
+    // 退出登录
     logout() {
       window.sessionStorage.clear()
       this.$router.push('/login')
@@ -89,13 +98,18 @@ export default {
     // 获取所有的菜单 promise要异步接收数据
     async getMenuList() {
       const { data: res } = await this.$http.get('menus')
-      if (res.meta.status != '200') this.$message.error(res.meta.msg)
+      if (res.meta.status !== 200) this.$message.error(res.meta.msg)
       this.menulist = res.data
       console.log('res', this.menulist)
     },
     // 是否折叠
     toggleCollapse() {
       this.isCollapse = !this.isCollapse
+    },
+    // 当前激活的菜单
+    saveNavState(activePath) {
+      window.sessionStorage.setItem('activePath', activePath)
+      this.activePath = activePath
     }
   }
 }
