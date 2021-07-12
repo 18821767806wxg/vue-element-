@@ -24,7 +24,9 @@
           </el-input>
         </el-col>
         <el-col :span="4">
-          <el-button class="button" type="primary">操作按钮</el-button>
+          <el-button class="button" type="primary" @click="addUsers"
+            >添加用户</el-button
+          >
         </el-col>
       </el-row>
 
@@ -51,11 +53,13 @@
               type="primary"
               icon="el-icon-edit"
               size="mini"
+              @click="alterUserList(scope.row)"
             ></el-button>
             <el-button
               type="danger"
               icon="el-icon-delete"
               size="mini"
+              @click="deleteUserList(scope.row)"
             ></el-button>
             <el-tooltip
               effect="dark"
@@ -85,11 +89,63 @@
       >
       </el-pagination>
     </el-card>
+
+    <!-- 增加用户按钮 -->
+    <el-dialog title="添加用户" width="60%" :visible.sync="dialogVisible">
+      <el-form
+        ref="addFormRef"
+        :model="addRuleForm"
+        label-width="100px"
+        class="demo-ruleForm"
+        :rules="addRule"
+      >
+        <el-form-item label="用户名称" prop="username">
+          <el-input v-model="addRuleForm.username"></el-input>
+        </el-form-item>
+
+        <el-form-item label="用户密码" prop="password">
+          <el-input v-model="addRuleForm.password" type="password"></el-input>
+        </el-form-item>
+
+        <el-form-item label="邮箱" prop="email">
+          <el-input v-model="addRuleForm.email"></el-input>
+        </el-form-item>
+
+        <el-form-item label="手机号" prop="mobile">
+          <el-input v-model="addRuleForm.mobile"></el-input>
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="dialogVisible = false">取 消</el-button>
+          <el-button type="primary" @click="addSubmit">确 定</el-button>
+        </span>
+      </template>
+    </el-dialog>
   </div>
 </template>
 <script>
 export default {
   data() {
+    // 验证邮箱规则
+    var checkEmail = (rule, value, cb) => {
+      // 验证邮箱的正则表达式
+      const regEmail = /^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+(\.[a-zA-Z0-9_-])+/
+      if (regEmail.test(value)) {
+        return cb()
+      }
+      cb(new Error('请输入合法的邮箱'))
+    }
+    // 验证手机号
+    var checkMobile = (rule, value, cb) => {
+      // 验证手机号的正则表达式
+      const regMobile = /^(0|86|17951)?(13[0-9]|15[012356789]|17[678]|18[0-9]|14[57])[0-9]{8}$/
+
+      if (regMobile.test(value)) {
+        return cb()
+      }
+      cb(new Error('请输入合法的手机号'))
+    }
     return {
       // 条件
       queryInfo: {
@@ -102,7 +158,35 @@ export default {
       // 总条数
       total: 0,
       // 列表数据
-      userlist: []
+      userlist: [],
+      // 控住弹窗
+      dialogVisible: false,
+      // 添加用户表单弹窗
+      addRuleForm: {
+        username: '', //用户名称
+        password: '', //用户密码
+        email: '', //邮箱
+        mobile: '' //手机号
+      },
+      addRule: {
+        // 验证用户名是否合法
+        username: [
+          { required: true, message: '请输入用户名称', trigger: 'blur' },
+          { min: 3, max: 10, message: '长度在 3 到 10 个字符', trigger: 'blur' }
+        ],
+        password: [
+          { required: true, message: '请输入用户密码', trigger: 'blur' },
+          { min: 6, max: 18, message: '长度在 6 到 18 个字符', trigger: 'blur' }
+        ],
+        email: [
+          { required: true, message: '请输入邮箱', trigger: 'blur' },
+          { validator: checkEmail, trigger: 'blur' }
+        ],
+        mobile: [
+          { required: true, message: '请输入手机号', trigger: 'blur' },
+          { validator: checkMobile, trigger: 'blur' }
+        ]
+      }
     }
   },
   created() {
@@ -142,6 +226,35 @@ export default {
       console.log('99999', value)
       this.queryInfo.pagenum = value
       this.getUserList()
+    },
+    // 修改用户数据
+    alterUserList(data) {
+      console.log('888888tttt', data)
+    },
+    // 删除用户数据
+    async deleteUserList(datas) {
+      console.log('删除', datas)
+      const { data: res } = await this.$http.delete(`users/${datas.id}`)
+      if (res.meta.status !== 200) {
+        return this.$message.error('删除用户信息失败！')
+      }
+      this.$message.success('修改用户信息成功！')
+      this.getUserList()
+    },
+    addUsers() {
+      console.log('180')
+      this.dialogVisible = true
+    },
+    // 增加弹窗确认按钮
+    addSubmit() {
+      this.$refs.addFormRef.validate(async valid => {
+        if (!valid) return
+        var { data: res } = await this.$http.post('users', this.addRuleForm)
+        if (res.meta.status !== 201) return this.$message.error('添加失败！')
+        this.$message.success('添加成功')
+        this.dialogVisible = false
+        this.getUserList()
+      })
     }
   }
 }

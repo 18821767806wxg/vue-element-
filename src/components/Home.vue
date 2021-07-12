@@ -8,7 +8,7 @@
           alt=""
           style="width:50px;height:50px; border-radius:50% ;"
         />
-        <span>车险核保管理系统</span>
+        <span>聚美商城管理系统</span>
       </div>
       <el-button type="info" @click="logout">退出</el-button>
     </el-header>
