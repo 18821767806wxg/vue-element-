@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import Login from './components/Login.vue'
-import Home from './components/Home.vue'
+// import Home from './components/Home.vue'
 import Welcome from './components/Welcome.vue'
 import User from './components/user/User.vue'
 import Roles from './components/power/Roles'
@@ -14,19 +14,27 @@ Vue.use(Router)
 const router = new Router({
   routes: [
     { path: '/', redirect: '/login' },
-    { path: '/login', component: Login },
+    { path: '/login', name: 'login', component: Login },
     {
       path: '/home',
-      component: Home,
+      component: () => import('./components/Home.vue'),//路由懒加载
       redirect: '/welcome',
-      children: [
-        { path: '/welcome', component: Welcome },
-        { path: '/users', component: User },
-        { path: '/roles', component: Roles },
-        { path: '/rights', component: Rights },
-        { path: '/categories', component: Categories },
-        { path: '/goods', component: Goods },
-        { path: '/params', component: Params }
+      children: [//嵌套子路由
+        {
+          path: '/welcome', name: 'welcome', component: Welcome
+          // // 路由独享的守卫
+          // beforeEnter: (to, from, next) => {
+          //   console.log("to88888", to)
+          //   debugger
+          //   if (to.path == '/welcome') next('/users')
+          // }
+        },
+        { path: '/users', name: 'users', component: User },
+        { path: '/roles', name: 'roles', component: Roles },
+        { path: '/rights', name: 'rights', component: Rights },
+        { path: '/categories', name: 'categories', component: Categories },
+        { path: '/goods', name: 'goods', component: Goods },
+        { path: '/params', name: 'params', component: Params }
       ]
     }
   ]
