@@ -241,6 +241,9 @@ export default {
   created() {
     this.getUserList()
   },
+  mounted() {
+    console.log('route', this.$router.currentRoute.fullPath)
+  },
   methods: {
     // 用户数据列表
     async getUserList() {
@@ -304,15 +307,28 @@ export default {
     },
     // 增加弹窗确认按钮
     addSubmit() {
-      this.$refs.addFormRef.validate(async valid => {
+      // this.$refs.addFormRef.validate(async valid => {
+      //   if (!valid) return
+      //   var { data: res } = await this.$http.post('users', this.addRuleForm)
+      //   if (res.meta.status !== 201) return this.$message.error('添加失败！')
+      //   // 关闭对话框
+      //   this.dialogVisible = false
+      //   // 刷新数据列表
+      //   this.getUserList()
+      //   this.$message.success('添加成功')
+      // })
+      this.$refs.addFormRef.validate(valid => {
         if (!valid) return
-        var { data: res } = await this.$http.post('users', this.addRuleForm)
-        if (res.meta.status !== 201) return this.$message.error('添加失败！')
-        // 关闭对话框
-        this.dialogVisible = false
-        // 刷新数据列表
-        this.getUserList()
-        this.$message.success('添加成功')
+        this.$http.post('users', this.addRuleForm).then(res => {
+          console.log('res', res.data)
+          if (res.data.meta.status !== 201)
+            return this.$message.error('添加失败！')
+          // 关闭对话框
+          this.dialogVisible = false
+          // 刷新数据列表
+          this.getUserList()
+          this.$message.success('添加成功')
+        })
       })
     },
     // 修改用户信息并提交
