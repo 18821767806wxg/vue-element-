@@ -31,8 +31,13 @@
       </el-row>
 
       <!-- 表格区域 -->
-      <el-table :data="userlist" border stripe>
-        <el-table-column type="index"></el-table-column>
+      <el-table
+        :data="userlist"
+        border
+        stripe
+        @selection-change="handleSelectionChange"
+      >
+        <el-table-column type="selection"></el-table-column>
         <el-table-column label="姓名" prop="username"></el-table-column>
         <el-table-column label="邮箱" prop="email"></el-table-column>
         <el-table-column label="电话" prop="mobile"></el-table-column>
@@ -202,6 +207,8 @@ export default {
         email: '', //邮箱
         mobile: '' //手机号
       },
+      // 表格多选框选中的数据
+      multipleSelection: [],
       addRule: {
         // 验证用户名是否合法
         username: [
@@ -363,6 +370,11 @@ export default {
     // 监听弹窗关闭事件
     addDialogClosed() {
       this.$refs.addFormRef.resetFields()
+    },
+    //选中表格事件
+    handleSelectionChange(val) {
+      console.log('bbb', val)
+      this.multipleSelection = val
     }
   }
 }
