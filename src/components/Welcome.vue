@@ -14,12 +14,13 @@ export default {
     }
   },
   watch: {
+    // 简单的监听事件
     firstName(newName, oldName) {
       this.fullName = newName + ' ' + this.lastName
     }
   },
   mounted() {
-    this.fn('abcccccc')
+    // this.fn('abcccccc')
   },
   methods: {
     fn(str) {
