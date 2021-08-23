@@ -1,3 +1,4 @@
+/* *@Description: *@ClassAuthor: Wang Xiao Gang *@Date: 2021-08-06 16:07:41 */
 <template>
   <div>
     <!-- 面包屑导航区域 -->
@@ -5,6 +6,41 @@
       <el-breadcrumb-item :to="{ path: '/home' }">首页</el-breadcrumb-item>
       <el-breadcrumb-item>用户管理</el-breadcrumb-item>
       <el-breadcrumb-item>用户列表</el-breadcrumb-item>
+      <codelist :userDate="userDate"></codelist>
+      <el-row :gutter="5">
+        <el-col :span="6">
+          <el-select
+            v-model="selectValue"
+            placeholder="请选择"
+            @change="selectclick"
+            multiple
+            collapse-tags
+            :multiple-limit="1"
+            filterable
+          >
+            <el-option
+              v-for="item in cities"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            >
+              <span style="float: left">{{ item.label }}</span>
+              <span style="float: right; color: #8492a6; font-size: 13px">{{
+                item.value
+              }}</span>
+            </el-option>
+          </el-select>
+        </el-col>
+        <el-col :span="6">
+          <el-date-picker
+            v-model="value2"
+            type="date"
+            placeholder="选择日期"
+            align="right"
+          >
+          </el-date-picker
+        ></el-col>
+      </el-row>
     </el-breadcrumb>
 
     <!-- 卡片区域 -->
@@ -35,15 +71,27 @@
         :data="userlist"
         border
         stripe
+        :header-cell-style="headFirst"
+        :sortable="true"
+        @sort-change="sortState"
         @selection-change="handleSelectionChange"
+        style="width:100%"
+        :span-method="objectSpanMethod"
       >
-        <el-table-column type="selection"></el-table-column>
-        <el-table-column label="姓名" prop="username"></el-table-column>
-        <el-table-column label="邮箱" prop="email"></el-table-column>
-        <el-table-column label="电话" prop="mobile"></el-table-column>
+        <!-- <el-table-column type="selection"></el-table-column> -->
+        <el-table-column label="姓名电话" align="center">
+          <el-table-column prop="username" align="center"> </el-table-column>
+          <!-- <el-table-column label="邮箱" prop="email"></el-table-column> -->
+          <el-table-column prop="mobile" align="center"> </el-table-column>
+        </el-table-column>
+        <!-- <el-table-column label="角色" prop="role_name"></el-table-column> -->
         <el-table-column label="角色" prop="role_name"></el-table-column>
-        <el-table-column label="角色" prop="role_name"></el-table-column>
-        <el-table-column label="状态">
+        <el-table-column
+          label="状态"
+          sortable="custom"
+          :sort-orders="['ascending', 'descending']"
+          prop="mg_state"
+        >
           <template #default="scope">
             <el-switch
               v-model="scope.row.mg_state"
@@ -164,7 +212,9 @@
   </div>
 </template>
 <script>
+import codelist from '../code.vue'
 export default {
+  components: { codelist },
   data() {
     // 验证邮箱规则
     var checkEmail = (rule, value, cb) => {
@@ -186,6 +236,33 @@ export default {
       cb(new Error('请输入合法的手机号'))
     }
     return {
+      cities: [
+        {
+          value: 'Beijing',
+          label: '北京'
+        },
+        {
+          value: 'Shanghai',
+          label: '上海'
+        },
+        {
+          value: 'Nanjing',
+          label: '南京'
+        },
+        {
+          value: 'Chengdu',
+          label: '成都'
+        },
+        {
+          value: 'Shenzhen',
+          label: '深圳'
+        },
+        {
+          value: 'Guangzhou',
+          label: '广州'
+        }
+      ],
+      selectValue: '',
       // 条件
       queryInfo: {
         query: '',
@@ -194,10 +271,12 @@ export default {
         // 当前每页显示多少条数据
         pagesize: 1
       },
+      value2: '', //日期
       // 总条数
       total: 0,
       // 列表数据
       userlist: [],
+      userDate: '',
       // 控住弹窗
       dialogVisible: false,
       // 添加用户表单弹窗
@@ -249,9 +328,43 @@ export default {
     this.getUserList()
   },
   mounted() {
+    this.userDate = '20210818'
     console.log('route', this.$router.currentRoute.fullPath)
   },
   methods: {
+    sortState({ prop, order }) {
+      console.log('prop', { prop })
+      console.log('order', { order })
+      this.userlist.sort(this.compare(prop, order))
+      // this.userlist.sort(function(a, b) {
+      //   // debugger
+      //   console.log('a', a)
+      //   console.log('b', b)
+      // })
+    },
+    compare(propertyName, sort) {
+      return function(obj1, obj2) {
+        console.log('obj1', obj1)
+        console.log('obj2', obj2)
+        var value1 = obj1[propertyName]
+        var value2 = obj2[propertyName]
+
+        console.log('wangxiaogang ')
+        if (typeof value1 === 'string' && typeof value2 === 'string') {
+          const res = value1.localeCompare(value2, 'zh')
+          return sort === 'ascending' ? res : -res
+        } else {
+          if (value1 <= value2) {
+            return sort === 'ascending' ? -1 : 1
+          } else if (value1 > value2) {
+            return sort === 'ascending' ? 1 : -1
+          }
+        }
+      }
+    },
+    selectclick() {
+      console.log('222', this.selectValue)
+    },
     // 用户数据列表
     async getUserList() {
       const { data: res } = await this.$http.get('users', {
@@ -262,6 +375,7 @@ export default {
       }
       this.userlist = res.data.users
       this.total = res.data.total
+      this.$store.commit('setdetailList', res.data.users)
     },
     // 修改用户状态
     async handleSwitch(data) {
@@ -375,7 +489,49 @@ export default {
     handleSelectionChange(val) {
       console.log('bbb', val)
       this.multipleSelection = val
+    },
+    objectSpanMethod({ row, column, rowIndex, columnIndex }) {
+      if (columnIndex === 0) {
+        if (rowIndex % 3 === 0) {
+          return {
+            rowspan: 3,
+            colspan: 1
+          }
+        } else {
+          return {
+            rowspan: 0,
+            colspan: 0
+          }
+        }
+      }
+    },
+    headFirst({ row, column, rowIndex, columnIndex }) {
+      if (rowIndex === 1) {
+        return { display: 'none' }
+      }
     }
   }
 }
 </script>
+<style scoped lang="less">
+/* 写法一深度选择器 */
+/deep/ .el-input__prefix {
+  right: 0px;
+  text-align: right;
+}
+/* 写法二深度选择器 */
+// ::v-deep .el-input__prefix {
+//   right: 0px;
+//   text-align: right;
+// }
+/* 写法三 >>> 操作符 */
+// >>> .el-input__prefix {
+//   right: 0px;
+//   text-align: right;
+// }
+/* 写法四 :deep() */
+// :deep(.el-input__prefix) {
+//   right: 0px;
+//   text-align: right;
+// }
+</style>

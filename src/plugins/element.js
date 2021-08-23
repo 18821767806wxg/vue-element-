@@ -23,7 +23,10 @@ import {
     Switch,
     Pagination,
     Tooltip,
-    Dialog
+    Dialog,
+    Select,
+    Option,
+    DatePicker
 } from 'element-ui'
 
 Vue.use(Button)
@@ -50,4 +53,7 @@ Vue.use(Switch)
 Vue.use(Pagination)
 Vue.use(Tooltip)
 Vue.use(Dialog)
+Vue.use(Select)
+Vue.use(Option)
+Vue.use(DatePicker)
 Vue.prototype.$message = Message
