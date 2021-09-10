@@ -6,7 +6,10 @@
     <div class="login_box">
       <!-- 头像区域 -->
       <div class="avatar_box">
-        <img src="../assets/logo.png" alt="" />
+        <span style="line-height:130px;font-size:24px;font-weight:500;"
+          >用户登录</span
+        >
+        <!-- <img src="../assets/logo.png" alt="" /> -->
       </div>
       <!-- 登录表单区域 -->
       <el-form
@@ -113,7 +116,6 @@ export default {
       console.log('newVal', newVal)
       if (Number(newVal) === 2) {
         // 三个input框内都有值时需要做的操作
-
         this.isdisabled = false
       } else {
         // 至少一个没有值
@@ -202,6 +204,7 @@ export default {
   transform: translate(-50%, -50%);
 
   .avatar_box {
+    text-align: center;
     height: 130px;
     width: 130px;
     border: 1px solid #eee;
