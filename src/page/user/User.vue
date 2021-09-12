@@ -36,7 +36,7 @@
         :data="userlist"
         border
         stripe
-        :header-cell-style="headFirst"
+        :header-cell-style="{ background: '#eef1f6', color: '#606266' }"
         :sortable="true"
         @sort-change="sortState"
         @selection-change="handleSelectionChange"
@@ -48,11 +48,9 @@
 
         <el-table-column prop="username" align="center" label="姓名">
         </el-table-column>
-        <!-- <el-table-column label="邮箱" prop="email"></el-table-column> -->
+        <el-table-column label="邮箱" prop="email"></el-table-column>
         <el-table-column prop="mobile" align="center" label="电话">
         </el-table-column>
-
-        <!-- <el-table-column label="角色" prop="role_name"></el-table-column> -->
         <el-table-column label="角色" prop="role_name"></el-table-column>
         <el-table-column
           label="状态"
@@ -482,11 +480,6 @@ export default {
       //       colspan: 0
       //     }
       //   }
-      // }
-    },
-    headFirst({ row, column, rowIndex, columnIndex }) {
-      // if (rowIndex === 1) {
-      //   return { display: 'none' }
       // }
     }
   }

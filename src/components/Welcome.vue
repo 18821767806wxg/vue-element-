@@ -1,22 +1,19 @@
 <template>
   <div>
-    <p>FullName: {{ fullName }}</p>
-    <p>FirstName: <input type="text" v-model="firstName" /></p>
+    <p>{{ firstNames }}</p>
   </div>
 </template>
 <script>
 export default {
   data() {
     return {
-      firstName: 'Dawei',
-      lastName: 'Lou',
       fullName: ''
     }
   },
-  watch: {
+  computed: {
     // 简单的监听事件
-    firstName(newName, oldName) {
-      this.fullName = newName + ' ' + this.lastName
+    firstNames() {
+      return '欢迎回来'
     }
   },
   mounted() {

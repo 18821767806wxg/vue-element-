@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>覆盖IE覅阪ufiuefgiu</h1>
+    <h1>可以封装全局组件</h1>
     <h2>{{ date }}</h2>
   </div>
 </template>
