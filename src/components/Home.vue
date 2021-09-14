@@ -67,6 +67,7 @@
 </template>
 
 <script>
+import { getMenu } from '@/api/menu.js'
 export default {
   data() {
     return {
@@ -97,7 +98,7 @@ export default {
     },
     // 获取所有的菜单 promise要异步接收数据
     async getMenuList() {
-      const { data: res } = await this.$http.get('menus')
+      const { data: res } = await getMenu()
       if (res.meta.status !== 200) this.$message.error(res.meta.msg)
       this.menulist = res.data
       console.log('res', this.menulist)

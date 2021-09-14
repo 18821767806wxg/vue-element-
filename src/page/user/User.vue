@@ -178,6 +178,14 @@
   </div>
 </template>
 <script>
+import {
+  getUser,
+  handleSwitchBtn,
+  deleteUser,
+  addUser,
+  editUser,
+  alterUserApi
+} from '@/api/user.js'
 export default {
   data() {
     // 验证邮箱规则
@@ -338,9 +346,11 @@ export default {
     },
     // 用户数据列表
     async getUserList() {
-      const { data: res } = await this.$http.get('users', {
-        params: this.queryInfo
-      })
+      const { data: res } = await getUser(this.queryInfo)
+      // this.$http.get('users', {
+      //   params: this.queryInfo
+      // })
+      console.log(res)
       if (res.meta.status !== 200) {
         return this.$message.error('获取用户列表失败！')
       }
@@ -351,9 +361,10 @@ export default {
     // 修改用户状态
     async handleSwitch(data) {
       console.log('888', data)
-      const { data: res } = await this.$http.put(
-        `users/${data.id}/state/${data.mg_state}`
-      )
+      const { data: res } = await handleSwitchBtn(data)
+      // this.$http.put(
+      //   `users/${data.id}/state/${data.mg_state}`
+      // )
       if (res.meta.status !== 200) {
         return this.$message.error('修改用户状态失败！')
       }
@@ -374,7 +385,8 @@ export default {
     // 修改用户数据
     async alterUserList(id) {
       // console.log(id)
-      const { data: res } = await this.$http.get('users/' + id)
+      const { data: res } = await alterUserApi(id)
+      // this.$http.get('users/' + id)
 
       if (res.meta.status !== 200) {
         return this.$message.error('查询用户信息失败！')
@@ -386,7 +398,8 @@ export default {
     // 删除用户数据
     async deleteUserList(datas) {
       console.log('删除', datas)
-      const { data: res } = await this.$http.delete(`users/${datas.id}`)
+      const { data: res } = await deleteUser(datas)
+      // this.$http.delete(`users/${datas.id}`)
       if (res.meta.status !== 200) {
         return this.$message.error('删除用户信息失败！')
       }
@@ -410,32 +423,34 @@ export default {
       //   this.$message.success('添加成功')
       // })
       console.log(this.$refs.addFormRef.model)
-      // this.$refs.addFormRef.validate(valid => {
-      //   if (!valid) return
-      //   this.$http.post('users', this.addRuleForm).then(res => {
-      //     console.log('res', res.data)
-      //     if (res.data.meta.status !== 201)
-      //       return this.$message.error('添加失败！')
-      //     // 关闭对话框
-      //     this.dialogVisible = false
-      //     // 刷新数据列表
-      //     this.getUserList()
-      //     this.$message.success('添加成功')
-      //   })
-      // })
+      this.$refs.addFormRef.validate(valid => {
+        if (!valid) return
+        // this.$http.post('users', this.addRuleForm)
+        addUser(this.addRuleForm).then(res => {
+          console.log('res', res.data)
+          if (res.data.meta.status !== 201)
+            return this.$message.error('添加失败！')
+          // 关闭对话框
+          this.dialogVisible = false
+          // 刷新数据列表
+          this.getUserList()
+          this.$message.success('添加成功')
+        })
+      })
     },
     // 修改用户信息并提交
     editUserInfo() {
       this.$refs.editFormRef.validate(async valid => {
         if (!valid) return
         // 发起修改用户信息的数据请求
-        const { data: res } = await this.$http.put(
-          'users/' + this.editForm.id,
-          {
-            email: this.editForm.email,
-            mobile: this.editForm.mobile
-          }
-        )
+        const { data: res } = await editUser(this.editForm)
+        // this.$http.put(
+        //   'users/' + this.editForm.id,
+        //   {
+        //     email: this.editForm.email,
+        //     mobile: this.editForm.mobile
+        //   }
+        // )
 
         if (res.meta.status !== 200) {
           return this.$message.error('更新用户信息失败！')
