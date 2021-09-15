@@ -1,12 +1,12 @@
 <template>
   <div class="login_container">
-    <h3 style="text-align:left;color:#fff;font-size:20px;">
-      聚美优品后台管理系统 版本号：V1.0.0.02
+    <h3 style="text-align: left; color: #fff; font-size: 20px">
+      聚美优品后台管理系统 版本号：V1.0.0.03
     </h3>
     <div class="login_box">
       <!-- 头像区域 -->
       <div class="avatar_box">
-        <span style="line-height:130px;font-size:24px;font-weight:500;"
+        <span style="line-height: 130px; font-size: 24px; font-weight: 500"
           >用户登录</span
         >
       </div>
@@ -18,7 +18,7 @@
         label-width="80px"
         class="login_form"
       >
-        <div style="display:none">{{ Exist }}</div>
+        <div style="display: none">{{ Exist }}</div>
         <!-- 用户名 -->
         <el-row>
           <el-col>
@@ -77,7 +77,7 @@ export default {
       // 这是登录表单的数据绑定对象
       loginForm: {
         username: '', //admin
-        password: '' //123456
+        password: '', //123456
       },
       ifExist: '',
       isdisabled: true,
@@ -87,18 +87,28 @@ export default {
         // 验证用户名是否合法
         username: [
           { required: true, message: '请输入登录名称', trigger: 'blur' },
-          { min: 3, max: 10, message: '长度在 3 到 10 个字符', trigger: 'blur' }
+          {
+            min: 3,
+            max: 10,
+            message: '长度在 3 到 10 个字符',
+            trigger: 'blur',
+          },
         ],
         // 验证密码是否合法
         password: [
           { required: true, message: '请输入登录密码', trigger: 'blur' },
-          { min: 6, max: 15, message: '长度在 6 到 15 个字符', trigger: 'blur' }
+          {
+            min: 6,
+            max: 15,
+            message: '长度在 6 到 15 个字符',
+            trigger: 'blur',
+          },
         ],
         captcha_code: [
           { required: true, message: '请输入验证码', trigger: 'blur' },
-          { min: 4, max: 4, message: '长度在 4 个字符', trigger: 'blur' }
-        ]
-      }
+          { min: 4, max: 4, message: '长度在 4 个字符', trigger: 'blur' },
+        ],
+      },
     }
   },
   mounted() {
@@ -109,7 +119,7 @@ export default {
       return (this.ifExist =
         Number(Boolean(this.loginForm.username)) +
         Number(Boolean(this.loginForm.password)))
-    }
+    },
   },
   watch: {
     ifExist(newVal, oldVal) {
@@ -121,7 +131,7 @@ export default {
         // 至少一个没有值
         this.isdisabled = true
       }
-    }
+    },
   },
   methods: {
     // 点击重置按钮，重置登录表单
@@ -130,7 +140,7 @@ export default {
       this.$refs.loginFormRef.resetFields()
     },
     login() {
-      this.$refs.loginFormRef.validate(async valid => {
+      this.$refs.loginFormRef.validate(async (valid) => {
         if (!valid) return
         // const { data: res } = await this.$http.post('login', this.loginForm)
         const { data: res } = await logOn(this.loginForm)
@@ -183,8 +193,8 @@ export default {
       //     captcha_key
       //   // 'https://gimg2.baidu.com/image_search/src=http%3A%2…sec=1632298477&t=1c67a3ec25205a200f10d9420f8ef131.jpeg'
       // )
-    }
-  }
+    },
+  },
 }
 </script>
 
