@@ -6,62 +6,228 @@
       <el-breadcrumb-item>权限管理</el-breadcrumb-item>
       <el-breadcrumb-item>角色列表</el-breadcrumb-item>
     </el-breadcrumb>
-    <div>
-      <span style="color:red">{{ datetime }}</span>
-      <br />
-      <el-button
-        type="text"
-        :class="[isActive == '01' ? 'active' : 'normal-btn']"
-        @click="onchangeTab('01')"
-        >投保人1
-      </el-button>
-      <el-button
-        type="text"
-        :class="[isActive == '02' ? 'active' : 'normal-btn']"
-        @click="onchangeTab('02')"
-        >投保人 2</el-button
-      >
-      <el-button
-        type="text"
-        :class="[isActive == '03' ? 'active' : 'normal-btn']"
-        @click="onchangeTab('03')"
-        >投保人 3</el-button
-      >
-    </div>
-    <div
-      style="text-align:center;vertical-align:middle;height:20px;"
-      v-if="date"
+
+    <!-- 卡片视图 -->
+    <el-card>
+      <!-- 添加角色按钮区域 -->
+      <el-row>
+        <el-col>
+          <el-button type="primary">添加角色</el-button>
+        </el-col>
+      </el-row>
+
+      <!-- 角色列表区域 -->
+      <el-table :data="rolelist" border stripe>
+        <!-- 展开列 -->
+        <el-table-column type="expand">
+          <template slot-scope="scope">
+            <el-row
+              :class="['bdbottom', i1 === 0 ? 'bdtop' : '', 'vcenter']"
+              v-for="(item1, i1) in scope.row.children"
+              :key="item1.id"
+            >
+              <!-- 渲染一级权限 -->
+              <el-col :span="5">
+                <el-tag
+                  closable
+                  @close="removeRightById(scope.row, item1.id)"
+                  >{{ item1.authName }}</el-tag
+                >
+                <i class="el-icon-caret-right"></i>
+              </el-col>
+              <!-- 渲染二级和三级权限 -->
+              <el-col :span="19">
+                <!-- 通过 for 循环 嵌套渲染二级权限 -->
+                <el-row
+                  :class="[i2 === 0 ? '' : 'bdtop', 'vcenter']"
+                  v-for="(item2, i2) in item1.children"
+                  :key="item2.id"
+                >
+                  <el-col :span="6">
+                    <el-tag
+                      type="success"
+                      closable
+                      @close="removeRightById(scope.row, item2.id)"
+                      >{{ item2.authName }}</el-tag
+                    >
+                    <i class="el-icon-caret-right"></i>
+                  </el-col>
+                  <el-col :span="18">
+                    <el-tag
+                      type="warning"
+                      v-for="item3 in item2.children"
+                      :key="item3.id"
+                      closable
+                      @close="removeRightById(scope.row, item3.id)"
+                      >{{ item3.authName }}</el-tag
+                    >
+                  </el-col>
+                </el-row>
+              </el-col>
+            </el-row>
+          </template>
+        </el-table-column>
+        <!-- 索引列 -->
+        <el-table-column type="index"></el-table-column>
+        <el-table-column label="角色名称" prop="roleName"></el-table-column>
+        <el-table-column label="角色描述" prop="roleDesc"></el-table-column>
+        <el-table-column label="操作" width="300px">
+          <template slot-scope="scope">
+            <el-button size="mini" type="primary" icon="el-icon-edit"
+              >编辑</el-button
+            >
+            <el-button size="mini" type="danger" icon="el-icon-delete"
+              >删除</el-button
+            >
+            <el-button
+              size="mini"
+              type="warning"
+              icon="el-icon-setting"
+              @click="showSetRightDialog(scope.row)"
+              >分配权限</el-button
+            >
+          </template>
+        </el-table-column>
+      </el-table>
+    </el-card>
+    <el-dialog
+      title="分配权限"
+      :visible.sync="setRightDialogVisible"
+      width="50%"
+      @close="setRightDialogClosed"
     >
-      <span>时间：</span>
-      <input type="text" v-model="date" style="outline:none;border:none" />
-      <!-- <span v-pre>{{ this will not be compiled }}</span> -->
-    </div>
+      <!-- 树形控件 -->
+      <el-tree
+        :data="rightslist"
+        :props="treeProps"
+        show-checkbox
+        node-key="id"
+        default-expand-all
+        :default-checked-keys="defKeys"
+        ref="treeRef"
+      ></el-tree>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="setRightDialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="allotRights">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 <script>
+import {
+  getRoles,
+  deleteRole,
+  getAllroles,
+  allotRight_Api
+} from '@/api/roles.js'
 export default {
   data() {
     return {
       isActive: '01',
-      date: '20210906'
+      date: '20210906',
+      // 所有角色列表
+      rolelist: [],
+      setRightDialogVisible: false,
+      rightslist: [],
+      // 树形控件的属性绑定对象
+      treeProps: {
+        label: 'authName',
+        children: 'children'
+      },
+      // 默认选中的节点
+      defKeys: [],
+      // 当前即将分配权限的角色id
+      roleId: ''
     }
   },
-  mounted() {},
-  computed: {
-    datetime() {
-      return (
-        this.date.slice(0, 4) +
-        '-' +
-        this.date.slice(4, 6) +
-        '-' +
-        this.date.slice(6, 8)
-      )
-    }
+  mounted() {
+    this.getRolesList()
   },
+  computed: {},
   methods: {
-    onchangeTab(code) {
-      console.log('code', code)
-      this.isActive = code
+    showSetRightDialog(role) {
+      console.log('role', role)
+      this.roleId = role.id
+      getAllroles().then(res => {
+        if (res.data.meta.status !== 200) {
+          return this.$message.error('获取权限数据失败！')
+        }
+        this.rightslist = res.data.data
+
+        this.setRightDialogVisible = true
+        this.getLeafKeys(role, this.defKeys)
+      })
+    },
+    // 所有角色列表
+    getRolesList() {
+      getRoles()
+        .then(res => {
+          console.log(res)
+          if (res.data.meta.status !== 200) {
+            return this.$message.error('获取角色列表失败！')
+          }
+          this.rolelist = res.data.data
+        })
+        .catch(err => {
+          return this.$message.error('请求失败：' + err)
+        })
+    },
+    async removeRightById(role, rightId) {
+      console.log('删除对象权限')
+      const confirmResult = await this.$confirm(
+        '此操作将永久删除该文件, 是否继续?',
+        '提示',
+        {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }
+      ).catch(err => {
+        err
+      })
+      if (confirmResult !== 'confirm') {
+        return this.$message.info('取消了删除！')
+      }
+      deleteRole(role.id, rightId).then(res => {
+        if (res.data.meta.status !== 200) {
+          return this.$message.error('删除权限失败！')
+        } else {
+          role.children = res.data.data
+        }
+      })
+
+      // const { data: res } = await deleteRole(role.id,rightId)
+    },
+    // 通过递归的形式，获取角色下所有三级权限的id，并保存到 defKeys 数组中
+    getLeafKeys(node, arr) {
+      // 如果当前 node 节点不包含 children 属性，则是三级节点
+      if (!node.children) {
+        return arr.push(node.id)
+      }
+
+      node.children.forEach(item => this.getLeafKeys(item, arr))
+    },
+    // 会话框关闭事件
+    setRightDialogClosed() {
+      this.defKeys = []
+    },
+    async allotRights() {
+      const keys = [
+        ...this.$refs.treeRef.getCheckedKeys(),
+        ...this.$refs.treeRef.getHalfCheckedKeys()
+      ]
+      console.log(' this.roleId', this.roleId)
+      const idStr = keys.join(',') //数组变字符串
+      const { data: res } = await allotRight_Api(this.roleId, idStr)
+
+      console.log(res)
+      if (res.meta.status !== 200) {
+        return this.$message.error('分配权限失败！')
+      }
+
+      this.$message.success('分配权限成功！')
+      this.getRolesList()
+      this.setRightDialogVisible = false
     }
   },
   watch: {
@@ -77,10 +243,19 @@ export default {
 }
 </script>
 <style scoped>
-.active {
-  color: red !important;
+.el-tag {
+  margin: 8px;
 }
-.normal-btn {
-  color: #9999 !important;
+.bdtop {
+  border-top: 1px solid #eee;
+}
+
+.bdbottom {
+  border-bottom: 1px solid #eee;
+}
+
+.vcenter {
+  display: flex;
+  align-items: center;
 }
 </style>

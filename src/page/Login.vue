@@ -1,7 +1,7 @@
 <template>
   <div class="login_container">
     <h3 style="text-align:left;color:#fff;font-size:20px;">
-      聚美优品后台管理系统 版本号：V1.0.0.01
+      聚美优品后台管理系统 版本号：V1.0.0.02
     </h3>
     <div class="login_box">
       <!-- 头像区域 -->
@@ -9,7 +9,6 @@
         <span style="line-height:130px;font-size:24px;font-weight:500;"
           >用户登录</span
         >
-    
       </div>
       <!-- 登录表单区域 -->
       <el-form
