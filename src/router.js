@@ -1,8 +1,10 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Login from './page/Login.vue'
+// import Login from './page/Login.vue'
+const Login = () => import(/* webpackChunkName: "login_home_welcome" */ './page/Login.vue')//路由懒加载
 // import Home from './components/Home.vue'
-import Welcome from './components/Welcome.vue'
+const Welcome = () => import(/* webpackChunkName: "login_home_welcome" */ './components/Welcome.vue')
+// import Welcome from './components/Welcome.vue'
 import User from './page/user/User.vue'
 import Roles from './page/power/Roles'
 import Rights from './page/power/Rights'
@@ -17,7 +19,7 @@ const router = new Router({
     { path: '/login', name: 'login', component: Login },
     {
       path: '/home',
-      component: () => import('./components/Home.vue'),//路由懒加载
+      component: () => import(/* webpackChunkName: "login_home_welcome" */ './components/Home.vue'),//路由懒加载
       redirect: '/welcome',
       children: [//嵌套子路由
         {
