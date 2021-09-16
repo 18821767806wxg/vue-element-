@@ -13,6 +13,10 @@
       <el-row>
         <el-col>
           <el-button type="primary">添加角色</el-button>
+          <p v-for="(data, index) in keepList" :key="data">
+            {{ keepList.length - index }}<span>:天{{ keepList.length }}</span
+            ><span>索引{{ index }}key</span>
+          </p>
         </el-col>
       </el-row>
 
@@ -137,7 +141,9 @@ export default {
       // 默认选中的节点
       defKeys: [],
       // 当前即将分配权限的角色id
-      roleId: ''
+      roleId: '',
+      // 模拟数据
+      keepList: [1, 2, 3, 4, 5, 6]
     }
   },
   mounted() {
@@ -212,6 +218,8 @@ export default {
       this.defKeys = []
     },
     async allotRights() {
+      console.log('555555555', this.$refs.treeRef.getCheckedKeys())
+      console.log('6666666', this.$refs.treeRef.getHalfCheckedKeys())
       const keys = [
         ...this.$refs.treeRef.getCheckedKeys(),
         ...this.$refs.treeRef.getHalfCheckedKeys()
