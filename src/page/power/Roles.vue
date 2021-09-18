@@ -13,10 +13,37 @@
       <el-row>
         <el-col>
           <el-button type="primary">添加角色</el-button>
-          <p v-for="(data, index) in keepList" :key="data">
-            {{ keepList.length - index }}<span>:天{{ keepList.length }}</span
-            ><span>索引{{ index }}key</span>
-          </p>
+          <div class="phoneNumber">
+            <div
+              v-for="(data, index) in keepList"
+              :key="data"
+              style="height:80px;"
+              class="content"
+            >
+              <div class="person">
+                <span class="index">{{ keepList.length - index }}</span>
+              </div>
+              <div style="margin-left:30px;">
+                :天{{ index }}
+                的归属于该i多喝水更好地说的就是就活动介绍还记得时间段和北京市江湖再见
+              </div>
+            </div>
+            <div style="height: 300px;">
+              <el-steps
+                direction="vertical"
+                :active="codeIndex"
+                process-status="success"
+                :simple="false"
+              >
+                <el-step title="步骤 1"></el-step>
+                <el-step title="步骤 2"></el-step>
+                <el-step
+                  title="步骤 3"
+                  description="这是一段很长很长很长的描述性文字"
+                ></el-step>
+              </el-steps>
+            </div>
+          </div>
         </el-col>
       </el-row>
 
@@ -143,7 +170,8 @@ export default {
       // 当前即将分配权限的角色id
       roleId: '',
       // 模拟数据
-      keepList: [1, 2, 3, 4, 5, 6]
+      keepList: [1, 2, 3, 4, 5, 6],
+      codeIndex: 1
     }
   },
   mounted() {
@@ -250,7 +278,7 @@ export default {
   }
 }
 </script>
-<style scoped>
+<style scoped lang="less">
 .el-tag {
   margin: 8px;
 }
@@ -265,5 +293,47 @@ export default {
 .vcenter {
   display: flex;
   align-items: center;
+}
+/*
+*伪元素
+*/
+.phoneNumber {
+  margin-top: 20px;
+  height: 90%;
+  position: relative;
+  &::before {
+    content: ''; //\260E
+    font-size: 15px;
+    margin-right: 5px;
+    width: 1px;
+    top: 20px;
+    bottom: 84px;
+    background: #e5e5e5;
+    left: 10px;
+    position: absolute;
+  }
+}
+.person {
+  font-size: 16px;
+  color: #999;
+  display: flex;
+  flex-basis: auto;
+  justify-content: space-between;
+  position: relative;
+  .index {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    width: 20px;
+    height: 20px;
+    border-radius: 20px;
+    background: blue;
+  }
+}
+.content {
+  display: flex;
+  flex-basis: auto;
+  // justify-content: space-between;
 }
 </style>

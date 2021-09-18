@@ -29,7 +29,9 @@ import {
     DatePicker,
     Tag,
     MessageBox,
-    Tree
+    Tree,
+    Steps,
+    Step
 } from 'element-ui'
 
 Vue.use(Button)
@@ -61,5 +63,7 @@ Vue.use(Option)
 Vue.use(DatePicker)
 Vue.use(Tag)
 Vue.use(Tree)
+Vue.use(Steps)
+Vue.use(Step)
 Vue.prototype.$message = Message
 Vue.prototype.$confirm = MessageBox.confirm

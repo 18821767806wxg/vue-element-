@@ -1,0 +1,17 @@
+{
+  "folders": [
+	{
+		"path": "..\\..\\.."
+	},
+	{
+		"path": "F:\\meixin\\hunan\\hn-webapp"
+	},
+	{
+		"path": "..\\..\\..\\..\\3.vue-项目实战day1\\素材\\vue_api_server\\vue_api_server"
+	}
+],
+  "settings": {
+    "liveServer.settings.multiRootWorkspaceName": "vue_shop",
+    "liveServer.settings.port": 5502
+  }
+}
