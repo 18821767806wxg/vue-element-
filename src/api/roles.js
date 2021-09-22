@@ -15,4 +15,16 @@ export function getAllroles() {
 export function allotRight_Api(roleId, rids) {
     return http.post(`roles/${roleId}/rights`, { rids: rids })
 }
+// 添加角色
+export function addRoles(params) {
+    return http.post('roles', params)
+}
+// 删除角色
+export function deleteRoles(params) {
+    return http.delete(`roles/${params}`)
+}
+// 编辑提交角色
+export function editRolesSubmit(id, params) {
+    return http.put(`roles/${id}`, params)
+}
 

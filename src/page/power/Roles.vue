@@ -12,7 +12,9 @@
       <!-- 添加角色按钮区域 -->
       <el-row>
         <el-col>
-          <el-button type="primary">添加角色</el-button>
+          <el-button type="primary" @click="addRolesVisible = true"
+            >添加角色</el-button
+          >
           <div class="phoneNumber">
             <div
               v-for="(data, index) in keepList"
@@ -28,7 +30,7 @@
                 的归属于该i多喝水更好地说的就是就活动介绍还记得时间段和北京市江湖再见
               </div>
             </div>
-            <div style="height: 300px;">
+            <!-- <div style="height: 300px;">
               <el-steps
                 direction="vertical"
                 :active="codeIndex"
@@ -42,7 +44,7 @@
                   description="这是一段很长很长很长的描述性文字"
                 ></el-step>
               </el-steps>
-            </div>
+            </div> -->
           </div>
         </el-col>
       </el-row>
@@ -104,10 +106,18 @@
         <el-table-column label="角色描述" prop="roleDesc"></el-table-column>
         <el-table-column label="操作" width="300px">
           <template slot-scope="scope">
-            <el-button size="mini" type="primary" icon="el-icon-edit"
+            <el-button
+              size="mini"
+              type="primary"
+              icon="el-icon-edit"
+              @click="editRolesBtn(scope.row)"
               >编辑</el-button
             >
-            <el-button size="mini" type="danger" icon="el-icon-delete"
+            <el-button
+              size="mini"
+              type="danger"
+              icon="el-icon-delete"
+              @click="removeRolesBtn(scope.row)"
               >删除</el-button
             >
             <el-button
@@ -142,6 +152,56 @@
         <el-button type="primary" @click="allotRights">确 定</el-button>
       </span>
     </el-dialog>
+    <!-- 添加角色 -->
+    <el-dialog
+      title="添加角色"
+      :visible.sync="addRolesVisible"
+      width="50%"
+      @close="addDialogClosed"
+    >
+      <el-form
+        :model="addForm"
+        :rules="addFormRules"
+        ref="addFormRef"
+        label-width="80px"
+      >
+        <el-form-item label="角色名称" prop="roleName">
+          <el-input v-model="addForm.roleName"></el-input>
+        </el-form-item>
+        <el-form-item label="角色描述" prop="roleDesc">
+          <el-input v-model="addForm.roleDesc"></el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="addRolesVisible = false">取 消</el-button>
+        <el-button type="primary" @click="addRolesInfo">确 定</el-button>
+      </span>
+    </el-dialog>
+    <!-- 编辑角色 -->
+    <el-dialog
+      title="编辑角色"
+      :visible.sync="editRolesVisible"
+      width="50%"
+      @close="editDialogClosed"
+    >
+      <el-form
+        :model="editForm"
+        :rules="editFormRules"
+        ref="editFormRef"
+        label-width="80px"
+      >
+        <el-form-item label="角色名称" prop="roleName">
+          <el-input v-model="editForm.roleName"></el-input>
+        </el-form-item>
+        <el-form-item label="角色描述" prop="roleDesc">
+          <el-input v-model="editForm.roleDesc"></el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="editRolesVisible = false">取 消</el-button>
+        <el-button type="primary" @click="editRolesInfo">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -149,7 +209,10 @@ import {
   getRoles,
   deleteRole,
   getAllroles,
-  allotRight_Api
+  allotRight_Api,
+  addRoles,
+  deleteRoles,
+  editRolesSubmit
 } from '@/api/roles.js'
 export default {
   data() {
@@ -169,9 +232,50 @@ export default {
       defKeys: [],
       // 当前即将分配权限的角色id
       roleId: '',
+      editId: '',
       // 模拟数据
-      keepList: [1, 2, 3, 4, 5, 6],
-      codeIndex: 1
+      keepList: [],
+      codeIndex: 1,
+      addRolesVisible: false,
+      addForm: {
+        roleName: '',
+        roleDesc: ''
+      }, //添加用户表单
+      addFormRules: {
+        roleName: [
+          { required: true, message: '请输入角色名称', trigger: 'blur' },
+          { min: 2, max: 10, message: '长度在 2 到 10 个字符', trigger: 'blur' }
+        ],
+        roleDesc: [
+          { required: true, message: '请输入角色描述', trigger: 'blur' },
+          {
+            min: 5,
+            max: 100,
+            message: '长度在 5 到 100 个字符',
+            trigger: 'blur'
+          }
+        ]
+      },
+      editRolesVisible: false, //编辑弹窗
+      editForm: {
+        roleName: '',
+        roleDesc: ''
+      }, //添加用户表单
+      editFormRules: {
+        roleName: [
+          { required: true, message: '请输入角色名称', trigger: 'blur' },
+          { min: 2, max: 10, message: '长度在 2 到 10 个字符', trigger: 'blur' }
+        ],
+        roleDesc: [
+          { required: false, message: '请输入角色描述', trigger: 'blur' },
+          {
+            min: 5,
+            max: 100,
+            message: '长度在 5 到 100 个字符',
+            trigger: 'blur'
+          }
+        ]
+      }
     }
   },
   mounted() {
@@ -179,6 +283,61 @@ export default {
   },
   computed: {},
   methods: {
+    // 关闭弹窗
+    editDialogClosed() {
+      this.$refs.editFormRef.resetFields()
+    },
+    // 编辑提交
+    editRolesInfo() {
+      this.$refs.editFormRef.validate(async valid => {
+        if (!valid) return
+        const { data: res } = await editRolesSubmit(this.editId, this.editForm)
+        if (res.meta.status !== 200) {
+          return this.$message.error('编辑角色失败！')
+        }
+
+        this.$message.success('编辑角色成功')
+        this.getRolesList()
+        this.editRolesVisible = false
+      })
+    },
+    // 编辑角色
+    editRolesBtn(role) {
+      console.log('555555', role)
+      this.editId = role.id
+      this.editRolesVisible = true
+      this.editForm.roleName = role.roleName
+      this.editForm.roleDesc = role.roleDesc
+    },
+    // 删除角色
+    removeRolesBtn(role) {
+      var roleID = role.id
+      deleteRoles(roleID).then(res => {
+        if (res.data.meta.status !== 200) {
+          return this.$message.error('删除角色失败！')
+        } else {
+          this.$message.success('删除角色成功')
+          this.getRolesList()
+        }
+      })
+    },
+    // 添加角色
+    addRolesInfo() {
+      this.$refs.addFormRef.validate(valid => {
+        if (!valid) return
+        // this.$http.post('users', this.addRuleForm)
+        addRoles(this.addForm).then(res => {
+          console.log('res', res.data)
+          if (res.data.meta.status !== 201)
+            return this.$message.error('添加失败！')
+          // 关闭对话框
+          this.addRolesVisible = false
+          // 刷新数据列表
+          this.getRolesList()
+          this.$message.success('添加成功')
+        })
+      })
+    },
     showSetRightDialog(role) {
       console.log('role', role)
       this.roleId = role.id
@@ -244,6 +403,10 @@ export default {
     // 会话框关闭事件
     setRightDialogClosed() {
       this.defKeys = []
+    },
+    // 关闭弹窗事件
+    addDialogClosed() {
+      this.$refs.addFormRef.resetFields()
     },
     async allotRights() {
       console.log('555555555', this.$refs.treeRef.getCheckedKeys())
