@@ -40,7 +40,7 @@
         :sortable="true"
         @sort-change="sortState"
         @selection-change="handleSelectionChange"
-        style="width:100%"
+        style="width: 100%"
         :span-method="objectSpanMethod"
         @current-change="onCurrentRow"
       >
@@ -184,7 +184,7 @@ import {
   deleteUser,
   addUser,
   editUser,
-  alterUserApi
+  alterUserApi,
 } from '@/api/user.js'
 export default {
   data() {
@@ -200,7 +200,8 @@ export default {
     // 验证手机号
     var checkMobile = (rule, value, cb) => {
       // 验证手机号的正则表达式
-      const regMobile = /^(0|86|17951)?(13[0-9]|15[012356789]|17[678]|18[0-9]|14[57])[0-9]{8}$/
+      const regMobile =
+        /^(0|86|17951)?(13[0-9]|15[012356789]|17[678]|18[0-9]|14[57])[0-9]{8}$/
 
       if (regMobile.test(value)) {
         return cb()
@@ -211,28 +212,28 @@ export default {
       cities: [
         {
           value: 'Beijing',
-          label: '北京'
+          label: '北京',
         },
         {
           value: 'Shanghai',
-          label: '上海'
+          label: '上海',
         },
         {
           value: 'Nanjing',
-          label: '南京'
+          label: '南京',
         },
         {
           value: 'Chengdu',
-          label: '成都'
+          label: '成都',
         },
         {
           value: 'Shenzhen',
-          label: '深圳'
+          label: '深圳',
         },
         {
           value: 'Guangzhou',
-          label: '广州'
-        }
+          label: '广州',
+        },
       ],
       selectValue: '',
       // 条件
@@ -241,7 +242,7 @@ export default {
         // 当前的页数
         pagenum: 1,
         // 当前每页显示多少条数据
-        pagesize: 1
+        pagesize: 1,
       },
       value2: '', //日期
       // 总条数
@@ -256,7 +257,7 @@ export default {
         username: '', //用户名称
         password: '', //用户密码
         email: '', //邮箱
-        mobile: '' //手机号
+        mobile: '', //手机号
       },
       // 表格多选框选中的数据
       multipleSelection: [],
@@ -264,20 +265,30 @@ export default {
         // 验证用户名是否合法
         username: [
           { required: true, message: '请输入用户名称', trigger: 'blur' },
-          { min: 3, max: 10, message: '长度在 3 到 10 个字符', trigger: 'blur' }
+          {
+            min: 2,
+            max: 10,
+            message: '长度在 2 到 10 个字符',
+            trigger: 'blur',
+          },
         ],
         password: [
           { required: true, message: '请输入用户密码', trigger: 'blur' },
-          { min: 6, max: 18, message: '长度在 6 到 18 个字符', trigger: 'blur' }
+          {
+            min: 6,
+            max: 18,
+            message: '长度在 6 到 18 个字符',
+            trigger: 'blur',
+          },
         ],
         email: [
           { required: true, message: '请输入邮箱', trigger: 'blur' },
-          { validator: checkEmail, trigger: 'blur' }
+          { validator: checkEmail, trigger: 'blur' },
         ],
         mobile: [
           { required: true, message: '请输入手机号', trigger: 'blur' },
-          { validator: checkMobile, trigger: 'blur' }
-        ]
+          { validator: checkMobile, trigger: 'blur' },
+        ],
       },
       // 控制修改用户对话框的显示与隐藏
       editDialogVisible: false,
@@ -287,13 +298,13 @@ export default {
       editFormRules: {
         email: [
           { required: true, message: '请输入用户邮箱', trigger: 'blur' },
-          { validator: checkEmail, trigger: 'blur' }
+          { validator: checkEmail, trigger: 'blur' },
         ],
         mobile: [
           { required: true, message: '请输入用户手机', trigger: 'blur' },
-          { validator: checkMobile, trigger: 'blur' }
-        ]
-      }
+          { validator: checkMobile, trigger: 'blur' },
+        ],
+      },
     }
   },
   created() {
@@ -322,7 +333,7 @@ export default {
       // })
     },
     compare(propertyName, sort) {
-      return function(obj1, obj2) {
+      return function (obj1, obj2) {
         console.log('obj1', obj1)
         console.log('obj2', obj2)
         var value1 = obj1[propertyName]
@@ -423,10 +434,10 @@ export default {
       //   this.$message.success('添加成功')
       // })
       console.log(this.$refs.addFormRef.model)
-      this.$refs.addFormRef.validate(valid => {
+      this.$refs.addFormRef.validate((valid) => {
         if (!valid) return
         // this.$http.post('users', this.addRuleForm)
-        addUser(this.addRuleForm).then(res => {
+        addUser(this.addRuleForm).then((res) => {
           console.log('res', res.data)
           if (res.data.meta.status !== 201)
             return this.$message.error('添加失败！')
@@ -440,7 +451,7 @@ export default {
     },
     // 修改用户信息并提交
     editUserInfo() {
-      this.$refs.editFormRef.validate(async valid => {
+      this.$refs.editFormRef.validate(async (valid) => {
         if (!valid) return
         // 发起修改用户信息的数据请求
         const { data: res } = await editUser(this.editForm)
@@ -496,8 +507,8 @@ export default {
       //     }
       //   }
       // }
-    }
-  }
+    },
+  },
 }
 </script>
 <style scoped lang="less">
