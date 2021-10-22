@@ -125,7 +125,7 @@ export default {
     ifExist(newVal, oldVal) {
       console.log('newVal', newVal)
       if (Number(newVal) === 2) {
-        // 三个input框内都有值时需要做的操作
+        // 两个input框内都有值时需要做的操作
         this.isdisabled = false
       } else {
         // 至少一个没有值
