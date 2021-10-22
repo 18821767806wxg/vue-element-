@@ -31,9 +31,12 @@ import {
     MessageBox,
     Tree,
     Steps,
-    Step
+    Step,
+    Radio,
+    RadioGroup
 } from 'element-ui'
-
+Vue.use(Radio)
+Vue.use(RadioGroup)
 Vue.use(Button)
 Vue.use(Form)
 Vue.use(FormItem)

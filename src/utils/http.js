@@ -28,7 +28,7 @@ http.interceptors.request.use(config => {
     http.interceptors.response.use(function (response) {
         console.log("55555777", response)
         // console.log('88888', router.currentRoute)
-        //对响应数据做些事
+        //对响应数据做些事 `
         NProgress.done()
         return response;
     }, function (error) {

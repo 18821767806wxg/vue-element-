@@ -5,6 +5,7 @@
       <el-breadcrumb-item :to="{ path: '/home' }">首页</el-breadcrumb-item>
       <el-breadcrumb-item>权限管理</el-breadcrumb-item>
       <el-breadcrumb-item>角色列表</el-breadcrumb-item>
+      <h1>{{ isActive }}</h1>
     </el-breadcrumb>
 
     <!-- 卡片视图 -->
@@ -35,7 +36,7 @@
                 direction="vertical"
                 :active="codeIndex"
                 process-status="success"
-                :simple="false"
+                :simple="true"
               >
                 <el-step title="步骤 1"></el-step>
                 <el-step title="步骤 2"></el-step>
@@ -280,6 +281,7 @@ export default {
   },
   mounted() {
     this.getRolesList()
+    this.isActive = '02'
   },
   computed: {},
   methods: {
@@ -434,6 +436,7 @@ export default {
       handler(newVal, oldVal) {
         console.log('newVal', newVal)
         console.log('oldVal', oldVal)
+        this.isActive = '03'
       },
       immediate: true,
       deep: true
