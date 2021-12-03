@@ -142,7 +142,7 @@
       <template #footer>
         <span class="dialog-footer">
           <el-button @click="dialogVisible = false">取 消</el-button>
-          <el-button type="primary" @click="addSubmit">确 定</el-button>
+          <el-button type="primary" @click="debounceInput()">确 定</el-button>
         </span>
       </template>
     </el-dialog>
@@ -184,8 +184,9 @@ import {
   deleteUser,
   addUser,
   editUser,
-  alterUserApi,
+  alterUserApi
 } from '@/api/user.js'
+import { debounce } from '@/utils/debounce.js'
 export default {
   data() {
     // 验证邮箱规则
@@ -200,8 +201,7 @@ export default {
     // 验证手机号
     var checkMobile = (rule, value, cb) => {
       // 验证手机号的正则表达式
-      const regMobile =
-        /^(0|86|17951)?(13[0-9]|15[012356789]|17[678]|18[0-9]|14[57])[0-9]{8}$/
+      const regMobile = /^(0|86|17951)?(13[0-9]|15[012356789]|17[678]|18[0-9]|14[57])[0-9]{8}$/
 
       if (regMobile.test(value)) {
         return cb()
@@ -212,28 +212,28 @@ export default {
       cities: [
         {
           value: 'Beijing',
-          label: '北京',
+          label: '北京'
         },
         {
           value: 'Shanghai',
-          label: '上海',
+          label: '上海'
         },
         {
           value: 'Nanjing',
-          label: '南京',
+          label: '南京'
         },
         {
           value: 'Chengdu',
-          label: '成都',
+          label: '成都'
         },
         {
           value: 'Shenzhen',
-          label: '深圳',
+          label: '深圳'
         },
         {
           value: 'Guangzhou',
-          label: '广州',
-        },
+          label: '广州'
+        }
       ],
       selectValue: '',
       // 条件
@@ -242,7 +242,7 @@ export default {
         // 当前的页数
         pagenum: 1,
         // 当前每页显示多少条数据
-        pagesize: 1,
+        pagesize: 1
       },
       value2: '', //日期
       // 总条数
@@ -257,7 +257,7 @@ export default {
         username: '', //用户名称
         password: '', //用户密码
         email: '', //邮箱
-        mobile: '', //手机号
+        mobile: '' //手机号
       },
       // 表格多选框选中的数据
       multipleSelection: [],
@@ -269,8 +269,8 @@ export default {
             min: 2,
             max: 10,
             message: '长度在 2 到 10 个字符',
-            trigger: 'blur',
-          },
+            trigger: 'blur'
+          }
         ],
         password: [
           { required: true, message: '请输入用户密码', trigger: 'blur' },
@@ -278,17 +278,17 @@ export default {
             min: 6,
             max: 18,
             message: '长度在 6 到 18 个字符',
-            trigger: 'blur',
-          },
+            trigger: 'blur'
+          }
         ],
         email: [
           { required: true, message: '请输入邮箱', trigger: 'blur' },
-          { validator: checkEmail, trigger: 'blur' },
+          { validator: checkEmail, trigger: 'blur' }
         ],
         mobile: [
           { required: true, message: '请输入手机号', trigger: 'blur' },
-          { validator: checkMobile, trigger: 'blur' },
-        ],
+          { validator: checkMobile, trigger: 'blur' }
+        ]
       },
       // 控制修改用户对话框的显示与隐藏
       editDialogVisible: false,
@@ -298,13 +298,14 @@ export default {
       editFormRules: {
         email: [
           { required: true, message: '请输入用户邮箱', trigger: 'blur' },
-          { validator: checkEmail, trigger: 'blur' },
+          { validator: checkEmail, trigger: 'blur' }
         ],
         mobile: [
           { required: true, message: '请输入用户手机', trigger: 'blur' },
-          { validator: checkMobile, trigger: 'blur' },
-        ],
+          { validator: checkMobile, trigger: 'blur' }
+        ]
       },
+      debounceInput: () => {}
     }
   },
   created() {
@@ -318,8 +319,10 @@ export default {
       b = 4,
       c = false
     if ((5 > a && 5 > b) || c == true) {
-      console.log('342""""')
+      console.log('lll')
     }
+    // 防抖函数加载完以后
+    this.debounceInput = this.debouncev(this.addSubmit, 1000, false)
   },
   methods: {
     sortState({ prop, order }) {
@@ -333,7 +336,7 @@ export default {
       // })
     },
     compare(propertyName, sort) {
-      return function (obj1, obj2) {
+      return function(obj1, obj2) {
         console.log('obj1', obj1)
         console.log('obj2', obj2)
         var value1 = obj1[propertyName]
@@ -358,6 +361,7 @@ export default {
     // 用户数据列表
     async getUserList() {
       const { data: res } = await getUser(this.queryInfo)
+      getUser(this.queryInfo)
       // this.$http.get('users', {
       //   params: this.queryInfo
       // })
@@ -421,8 +425,30 @@ export default {
       console.log('180')
       this.dialogVisible = true
     },
+    /*
+     *防抖函数
+     */
+    debouncev(func, delay = 1000, immediate = false) {
+      let timer = null
+      //不能用箭头函数
+      return function() {
+        //在时间内重复调用的时候需要清空之前的定时任务
+        if (timer) {
+          clearTimeout(timer)
+        }
+        //适用于首次需要立刻执行的
+        if (immediate && !timer) {
+          func.apply(this, arguments)
+        }
+        timer = setTimeout(() => {
+          func.apply(this, arguments)
+        }, delay)
+      }
+    },
+    handle() {},
     // 增加弹窗确认按钮
     addSubmit() {
+      console.log('防抖')
       // this.$refs.addFormRef.validate(async valid => {
       //   if (!valid) return
       //   var { data: res } = await this.$http.post('users', this.addRuleForm)
@@ -433,25 +459,28 @@ export default {
       //   this.getUserList()
       //   this.$message.success('添加成功')
       // })
-      console.log(this.$refs.addFormRef.model)
-      this.$refs.addFormRef.validate((valid) => {
-        if (!valid) return
-        // this.$http.post('users', this.addRuleForm)
-        addUser(this.addRuleForm).then((res) => {
-          console.log('res', res.data)
-          if (res.data.meta.status !== 201)
-            return this.$message.error('添加失败！')
-          // 关闭对话框
-          this.dialogVisible = false
-          // 刷新数据列表
-          this.getUserList()
-          this.$message.success('添加成功')
-        })
-      })
+      // console.log(this.$refs.addFormRef.model, '8888177878')
+      // this.$refs.addFormRef.validate(valid => {
+      // if (!valid) return
+      // this.$http.post('users', this.addRuleForm)
+      // console.log('fangdou')
+      // addUser(this.addRuleForm)
+      // addUser(this.addRuleForm)
+      // .then(res => {
+      //   console.log('res', res.data)
+      //   if (res.data.meta.status !== 201)
+      //     return this.$message.error('添加失败！')
+      //   // 关闭对话框
+      //   // this.dialogVisible = false
+      //   // 刷新数据列表
+      //   // this.getUserList()
+      //   this.$message.success('添加成功')
+      // })
+      // })
     },
     // 修改用户信息并提交
     editUserInfo() {
-      this.$refs.editFormRef.validate(async (valid) => {
+      this.$refs.editFormRef.validate(async valid => {
         if (!valid) return
         // 发起修改用户信息的数据请求
         const { data: res } = await editUser(this.editForm)
@@ -508,7 +537,18 @@ export default {
       //   }
       // }
     },
-  },
+    debounceFn: debounce(
+      function(vm) {
+        // this.addSubmit()
+        console.log('fangdou')
+        // 这里将当前组件实例当参数传入
+        // 就可以使用实例中定义的一些属性、方法
+        // 补充一下，这里如果换成非箭头函数的写法，也可以直接访问实例。
+      },
+      500,
+      false
+    )
+  }
 }
 </script>
 <style scoped lang="less">
