@@ -1,4 +1,7 @@
 module.exports = {
+  publicPath: '/',
+  outputDir: './dist',
+  // productionSourcrMap: false,
   devServer: {
     overlay: {
       warnings: false,

@@ -32,6 +32,7 @@
       </el-row>
 
       <!-- 表格区域 -->
+
       <el-table
         :data="userlist"
         border
@@ -108,7 +109,13 @@
       >
       </el-pagination>
     </el-card>
-
+    <video-player
+      class="video-player vjs-custom-skin"
+      ref="videoPlayer"
+      :playsinline="true"
+      :options="playerOptions"
+      :x5-video-player-fullscreen="true"
+    ></video-player>
     <!-- 添加用户 -->
     <el-dialog
       title="添加用户"
@@ -186,7 +193,10 @@ import {
   editUser,
   alterUserApi,
 } from '@/api/user.js'
+import { videoPlayer } from 'vue-video-player'
+
 export default {
+  components: { videoPlayer },
   data() {
     // 验证邮箱规则
     var checkEmail = (rule, value, cb) => {
@@ -209,6 +219,35 @@ export default {
       cb(new Error('请输入合法的手机号'))
     }
     return {
+      playerOptions: {
+        playbackRates: [0.7, 1.0, 1.5, 2.0], //播放速度
+        autoplay: false, //如果true,浏览器准备好时开始回放。
+        muted: false, // 默认情况下将会消除任何音频。
+        loop: false, // 导致视频一结束就重新开始。
+        preload: 'auto', // 建议浏览器在<video>加载元素后是否应该开始下载视频数据。auto浏览器选择最佳行为,立即开始加载视频（如果浏览器支持）
+        language: 'zh-CN',
+        aspectRatio: '16:9', // 将播放器置于流畅模式，并在计算播放器的动态大小时使用该值。值应该代表一个比例 - 用冒号分隔的两个数字（例如"16:9"或"4:3"）
+        fluid: true, // 当true时，Video.js player将拥有流体大小。换句话说，它将按比例缩放以适应其容器。
+        sources: [
+          // {
+          //   type: 'video/mp4', //这里的种类支持很多种：基本视频格式、直播、流媒体等，具体可以参看git网址项目
+          //   src: 'http://v.xiaohongshu.com/92053aee23c73defe71ec8eafc02fb9db2ed23ba_r_ln?sign=8a697178adbb2db083bde80567881eb6&t=6245d000', //url地址
+          // },
+          {
+            type: 'video/mp4',
+            src: 'http://v.xiaohongshu.com/pre_post/01e242c8732292d8018370037fd4e20b20_259.mp4?sign=da811bda9c82fea2ab8aaf8f516b1896&t=6245d000',
+          },
+        ],
+        poster: '', //你的封面地址
+        // width: document.documentElement.clientWidth, //播放器宽度
+        notSupportedMessage: '此视频暂无法播放，请稍后再试', //允许覆盖Video.js无法播放媒体源时显示的默认信息。
+        controlBar: {
+          timeDivider: true,
+          durationDisplay: true,
+          remainingTimeDisplay: false,
+          fullscreenToggle: true, //全屏按钮
+        },
+      },
       cities: [
         {
           value: 'Beijing',
@@ -235,6 +274,7 @@ export default {
           label: '广州',
         },
       ],
+      num: 0,
       selectValue: '',
       // 条件
       queryInfo: {
@@ -423,31 +463,35 @@ export default {
     },
     // 增加弹窗确认按钮
     addSubmit() {
-      // this.$refs.addFormRef.validate(async valid => {
-      //   if (!valid) return
-      //   var { data: res } = await this.$http.post('users', this.addRuleForm)
-      //   if (res.meta.status !== 201) return this.$message.error('添加失败！')
-      //   // 关闭对话框
-      //   this.dialogVisible = false
-      //   // 刷新数据列表
-      //   this.getUserList()
-      //   this.$message.success('添加成功')
-      // })
-      console.log(this.$refs.addFormRef.model)
-      this.$refs.addFormRef.validate((valid) => {
+      this.$refs.addFormRef.validate(async (valid) => {
         if (!valid) return
-        // this.$http.post('users', this.addRuleForm)
-        addUser(this.addRuleForm).then((res) => {
-          console.log('res', res.data)
-          if (res.data.meta.status !== 201)
-            return this.$message.error('添加失败！')
-          // 关闭对话框
+        this.num++
+        let a = this.num
+        var { data: res } = await addUser(this.addRuleForm)
+        if (res.meta.status !== 201) return this.$message.error('添加失败！')
+        // 关闭对话框
+        if (a == this.num) {
           this.dialogVisible = false
           // 刷新数据列表
           this.getUserList()
           this.$message.success('添加成功')
-        })
+        }
       })
+      // console.log(this.$refs.addFormRef.model)
+      // this.$refs.addFormRef.validate((valid) => {
+      //   if (!valid) return
+      //   // this.$http.post('users', this.addRuleForm)
+      //   addUser(this.addRuleForm).then((res) => {
+      //     console.log('res', res.data)
+      //     if (res.data.meta.status !== 201)
+      //       return this.$message.error('添加失败！')
+      //     // 关闭对话框
+      //     this.dialogVisible = false
+      //     // 刷新数据列表
+      //     this.getUserList()
+      //     this.$message.success('添加成功')
+      //   })
+      // })
     },
     // 修改用户信息并提交
     editUserInfo() {

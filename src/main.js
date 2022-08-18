@@ -8,6 +8,10 @@ import './assets/fonts/iconfont.css'
 // 导入全局样式表
 import './assets/css/global.css'
 import 'nprogress/nprogress.css'
+import VideoPlayer from 'vue-video-player'
+require('video.js/dist/video-js.css')
+require('vue-video-player/src/custom-theme.css')
+Vue.use(VideoPlayer)
 
 // 阻止启动生产消息
 // Vue.config.productionTip = false
